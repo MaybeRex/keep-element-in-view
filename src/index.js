@@ -5,10 +5,16 @@
  * @return {Boolean}            true
  */
 const correctCoordinates = (target, host = document.body) => {
+  let type = 'elementMove';
+
   const isHTMLElement = target instanceof HTMLElement;
 
-  if (!target || !isHTMLElement) {
-    throw new Error('target element must be an HTMLElement');
+  if (!target) {
+    throw new Error('Must pass either HTMLElement or cooridinate object!');
+  }
+
+  if (!isHTMLElement) {
+    type = 'coorditate';
   }
 
   const { position } = window.getComputedStyle(target);
@@ -17,16 +23,27 @@ const correctCoordinates = (target, host = document.body) => {
     console.warn('Target element will not show poistional changes with current display rule');
   }
 
-  const {
-    left, right, top, bottom
-  } = target.getBoundingClientRect();
+  let coordinates = {}
+
+  if (type === 'elementMove') {
+    coordinates = target.getBoundingClientRect();
+  } else {
+    coordinates = {...target};
+  }
 
   const {
-    hostleft, hostright, hosttop, hostbottom
-  } = host.getBoundingClientRect();
+    left, top, bottom
+  } = coordinates;
+
+  const hostCoordinates = host.getBoundingClientRect();
+
+  const hostleft = hostCoordinates.left;
+  const hostright = hostCoordinates.right;
+  const hosttop = hostCoordinates.top;
+  const hostbottom = hostCoordinates.bottom;
 
   const updatedCoordinates = {
-    left, right, top, bottom
+    left, top, bottom
   };
 
   const outOfBoundsLeft = hostleft > left;
@@ -87,12 +104,16 @@ const correctCoordinates = (target, host = document.body) => {
     }
   }
 
-  target.style.left = updatedCoordinates.left;
-  target.style.top = updatedCoordinates.top;
-  target.style.height = updatedCoordinates.height;
-  target.style.width = updatedCoordinates.left;
+  if (type === 'elementMove') {
+    target.style.left = updatedCoordinates.left;
+    target.style.top = updatedCoordinates.top;
+    target.style.height = updatedCoordinates.height;
+    target.style.width = updatedCoordinates.left;
 
-  return true;
+    return true;
+  } else {
+    return { ...updatedCoordinates }
+  }
 }
 
 export default correctCoordinates;
