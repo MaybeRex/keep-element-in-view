@@ -1,0 +1,36 @@
+{
+  "name": "keep-element-in-view",
+  "version": "0.0.1",
+  "description": "Corrects coordinates of an HTMLElement so it stays inside another",
+  "main": "bundle.js",
+  "scripts": {
+    "build": "babel src --out-file bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaybeRex/keep-element-in-view.git"
+  },
+  "keywords": [
+    "HTMLElement",
+    "coorditate",
+    "correction",
+    "view",
+    "keep"
+  ],
+  "author": "Mario Solorzano",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MaybeRex/keep-element-in-view/issues"
+  },
+  "homepage": "https://github.com/MaybeRex/keep-element-in-view#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-uglify": "^1.0.2",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-minify": "^0.3.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-preset-stage-1": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1"
+  }
+}
