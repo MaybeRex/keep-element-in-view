@@ -1,119 +1,120 @@
 /**
  * method takes target element and its host
- * @param  {HTMLElement} target element to keep in check
+ * @param  {HTMLElement || Object} target element to keep in check
  * @param  {HTMLElement} host   container to keep target in, window if undefined
  * @return {Boolean}            true
  */
-const correctCoordinates = (target, host = document.body) => {
-  let type = 'elementMove';
 
-  const isHTMLElement = target instanceof HTMLElement;
+ const correctCoordinates = (target, host = document.body) => {
+   let type = 'elementMove';
 
-  if (!target) {
-    throw new Error('Must pass either HTMLElement or cooridinate object!');
-  }
+   const isHTMLElement = target instanceof HTMLElement;
 
-  if (!isHTMLElement) {
-    type = 'coorditate';
-  }
+   if (!target) {
+     throw new Error('Must pass either HTMLElement or cooridinate object!');
+   }
 
-  const { position } = window.getComputedStyle(target);
+   if (!isHTMLElement) {
+     type = 'coorditate';
+   }
 
-  if (position === 'static' || position === 'sticky') {
-    console.warn('Target element will not show poistional changes with current display rule');
-  }
 
-  let coordinates = {}
+   if (type === 'elementMove') {
+     const { position } = window.getComputedStyle(target);
 
-  if (type === 'elementMove') {
-    coordinates = target.getBoundingClientRect();
-  } else {
-    coordinates = {...target};
-  }
+     if (position === 'static' || position === 'sticky') {
+       console.warn('Target element will not show poistional changes with current display rule');
+     }
+   }
 
-  const {
-    left, top, bottom
-  } = coordinates;
+   let coordinates = {};
 
-  const hostCoordinates = host.getBoundingClientRect();
+   if (type === 'elementMove') {
+     coordinates = target.getBoundingClientRect();
+   } else {
+     coordinates = { ...target };
+   }
 
-  const hostleft = hostCoordinates.left;
-  const hostright = hostCoordinates.right;
-  const hosttop = hostCoordinates.top;
-  const hostbottom = hostCoordinates.bottom;
+   const {
+     left, top, width, height
+   } = coordinates;
 
-  const updatedCoordinates = {
-    left, top, bottom
-  };
+   const hostCoordinates = host.getBoundingClientRect();
 
-  const outOfBoundsLeft = hostleft > left;
-  const outOfBoundsRight = hostright < (left + width);
-  const outOfBoundsTop = hosttop > top;
-  const outOfBoundsBottom = hostbottom < top + height;
+   const hostleft = hostCoordinates.left;
+   const hostright = hostCoordinates.right;
+   const hosttop = hostCoordinates.top;
+   const hostbottom = hostCoordinates.bottom;
 
-  if (outOfBoundsTop || outOfBoundsBottom) {
-    const topDiff = top - hosttop;
-    const bottomDiff = hostbottom - (top + height);
-    let heightUpdate = 0;
+   const updatedCoordinates = {
+     left, top, width, height
+   };
 
-    if (bottomDiff < 0 && topDiff < 0) {
-      heightUpdate = Math.abs(bottomDiff + topDiff);
-      updatedCoordinates.height -= heightUpdate;
-    }
+   const outOfBoundsLeft = hostleft > left;
+   const outOfBoundsRight = hostright < (left + width);
+   const outOfBoundsTop = hosttop > top;
+   const outOfBoundsBottom = hostbottom < top + height;
 
-    switch (true) {
-      case outOfBoundsTop && outOfBoundsBottom:
-      case outOfBoundsTop: {
-        updatedCoordinates.top -= topDiff;
-        break;
-      }
-      case outOfBoundsBottom: {
-        updatedCoordinates.top += bottomDiff + heightUpdate;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }
+   if (outOfBoundsTop || outOfBoundsBottom) {
+     const topDiff = top - hosttop;
+     const bottomDiff = hostbottom - (top + height);
+     let heightUpdate = 0;
 
-  if (outOfBoundsLeft || outOfBoundsRight) {
-    const rightDiff = hostright - (left + width);
-    const leftDiff = hostleft - left;
-    let widthUpdate = 0;
+     if (bottomDiff < 0 && topDiff < 0) {
+       heightUpdate = Math.abs(bottomDiff + topDiff);
+       updatedCoordinates.height -= heightUpdate;
+     }
 
-    if ((rightDiff - leftDiff) < 0) {
-      // NOTE 1 pix additional here just for style (;
-      widthUpdate = rightDiff - leftDiff - 1;
-      updatedCoordinates.width += widthUpdate;
-    }
+     switch (true) {
+       case outOfBoundsTop && outOfBoundsBottom:
+       case outOfBoundsTop: {
+         updatedCoordinates.top -= topDiff;
+         break;
+       }
+       case outOfBoundsBottom: {
+         updatedCoordinates.top += bottomDiff + heightUpdate;
+         break;
+       }
+       default: {
+         break;
+       }
+     }
+   }
 
-    switch (true) {
-      case outOfBoundsLeft && outOfBoundsRight:
-      case outOfBoundsLeft: {
-        updatedCoordinates.left += leftDiff;
-        break;
-      }
-      case outOfBoundsRight: {
-        updatedCoordinates.left += rightDiff - widthUpdate;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }
+   if (outOfBoundsLeft || outOfBoundsRight) {
+     const rightDiff = hostright - (left + width);
+     const leftDiff = hostleft - left;
+     let widthUpdate = 0;
 
-  if (type === 'elementMove') {
-    target.style.left = updatedCoordinates.left;
-    target.style.top = updatedCoordinates.top;
-    target.style.height = updatedCoordinates.height;
-    target.style.width = updatedCoordinates.left;
+     if ((rightDiff - leftDiff) < 0) {
+       // NOTE 1 pix additional here just for style (;
+       widthUpdate = rightDiff - leftDiff - 1;
+       updatedCoordinates.width += widthUpdate;
+     }
 
-    return true;
-  } else {
-    return { ...updatedCoordinates }
-  }
-}
+     switch (true) {
+       case outOfBoundsLeft && outOfBoundsRight:
+       case outOfBoundsLeft: {
+         updatedCoordinates.left += leftDiff;
+         break;
+       }
+       case outOfBoundsRight: {
+         updatedCoordinates.left += rightDiff - widthUpdate;
+         break;
+       }
+       default: {
+         break;
+       }
+     }
+   }
 
-export default correctCoordinates;
+   if (type === 'elementMove') {
+     target.style.left = updatedCoordinates.left;
+     target.style.top = updatedCoordinates.top;
+     target.style.height = updatedCoordinates.height;
+     target.style.width = updatedCoordinates.left;
+
+     return true;
+   }
+   return { ...updatedCoordinates };
+ };
