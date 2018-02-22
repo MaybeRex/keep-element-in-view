@@ -1,6 +1,6 @@
 {
   "name": "keep-element-in-view",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Corrects coordinates of an HTMLElement so it stays inside another",
   "main": "bundle.js",
   "scripts": {
